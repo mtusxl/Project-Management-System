@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProjectName</title>
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+        crossorigin="anonymous">
+
+        
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #323436;
+            color: #fff;
+            font-family: 'Roboto', sans-serif;
+        }
+        .dropdown-menu{
+            left: 0;
+            height: 100vh;
+            width: 50vh;
+            background-color: #212529;
+            color: #fff;
+            transition: transform 0.3s ease; /* Анимация перехода */
+            
+        }
+        
+
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+            top: 10;
+            transform: translateX(50vh); 
+            border-bottom: 1px solid #ddd;
+            
+        }
+
+        #DownNav {
+            display: block;
+            height: 10vh; /* Занимает всю высоту экрана */
+            border-bottom: 1px solid #ddd;
+            
+        }
+
+        hr{ z-index: 100;}
+        .navbar-brand{margin-left: 3vh;}
+
+        .form-control
+        {
+            height: 100px;
+            background-color: #212529;
+            color: #ddd;
+            border: #fff;
+        }
+
+        .DiscriptionSelection
+        {
+            margin-top: 10vh;
+        }
+        .form-control:focus
+        {
+            height: 100px;
+            background-color: #212529;
+            color: #ddd;
+    
+        }
+
+        .participant {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+        }
+        .participant-icon {
+            width: 40px;
+            height: 40px;
+            background-color: #f56c6c;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 10px;
+            font-size: 18px;
+        }
+        .role {
+            font-size: 12px;
+            color: grey;
+        }
+    </style>
+</head>
+    <body>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="mainNav">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-bars"></i> Меню
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <ul>
+                                <li><a href="home.html" class="active"><i class="fas fa-home"></i> Главная</a></li>
+                                <li><a href="my_tasks.html"><i class="fas fa-tasks"></i> Мои задачи</a></li>
+                                <li><a href="#"><i class="fas fa-chart-bar"></i> Аналитика</a>
+                                    <ul>
+                                        <li><a href="#"><i class="fas fa-chart-line"></i> Отчеты</a></li>
+                                        <li><a href="#"><i class="fas fa-folder-open"></i> Портфели</a></li>
+                                        <li><a href="#"><i class="fas fa-bullseye"></i> Цели</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#"><i class="fas fa-project-diagram"></i> Проекты</a>
+                                    <ul>
+                                        <li><a href="#"><i class="fas fa-folder-open"></i>none</a></li>
+                                        <li><a href="#"><i class="fas fa-database"></i> None</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li class="nav-item">
+                        <a  class="nav-link" href="#">
+                            <i class="fas fa-plus-circle"></i> Создать
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="#">Проект</a>
+                            <a class="dropdown-item" href="#">Задача</a>
+                        </div>
+                    </li>
+                </ul>
+                <a class="navbar-brand" href="#">Team Synergy</a>
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" >
+                            <i class="fas fa-user-circle"></i> Аккаунт
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="#">Профиль</a>
+                            <a class="dropdown-item" href="#">Выход</a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        <hr class="m-0"> 
+        
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button class="nav-link active" id="review-tab" data-bs-toggle="tab" data-bs-target="#review" type="button" role="tab" aria-controls="review" aria-selected="true">Обзор проекта</button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="tasks-tab" data-bs-toggle="tab" data-bs-target="#tasks" type="button" role="tab" aria-controls="tasks" aria-selected="false">Задачи</button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="members-tab" data-bs-toggle="tab" data-bs-target="#members" type="button" role="tab" aria-controls="members" aria-selected="false">Члены проекта</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="Storage-tab" data-bs-toggle="tab" data-bs-target="#Storage" type="button" role="tab" aria-controls="Storage" aria-selected="false">Хранилище файлов</button>
+            </li>
+          </ul>
+          <div class="tab-content" id="myTabContent">
+            <div class="tab-pane fade show active" id="review" role="tabpanel" aria-labelledby="review-tab">
+                <div class="DiscriptionSelection container-lg">
+                    <h3 class="text-brend">Описание проекта</h3>
+                    <div class="form-floating">
+                        <textarea class="form-control" placeholder="Comments" id="floatingTextarea2"></textarea>
+                    </div>
+                </div>
+
+                <div class="Members container-lg">
+                    <h1 class="members-header">Участники</h6>
+                        <div class="members-select container mt-4">
+                            <!-- First participant with "fa-user-plus" icon -->
+                            <div class="participant">
+                                <div class="participant-icon">
+                                    <i class="fas fa-user-plus"></i>
+                                </div>
+                                <div>
+                                    <strong>Добавить участника</strong>
+                                </div>
+                            </div>
+                        
+                            <!-- Second participant -->
+                            <div class="participant">
+                                <div class="participant-icon">
+                                    <span>mD</span>
+                                </div>
+                                <div>
+                                    <strong>mr. Djuzo</strong><br>
+                                    <span class="role">Ответственный за п...</span>
+                                </div>
+                            </div>
+                        
+                            <!-- Third participant with email -->
+                            <div class="participant">
+                                <div class="participant-icon" style="background-color: #8e8cd8;">
+                                    <span>mt</span>
+                                </div>
+                                <div>
+                                    <strong>mtusxl@gmail.com</strong><br>
+                                    <div class="dropdown">
+                                        <button class="btn btn-link dropdown-toggle role" type="button" id="dropdownRoleButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            + Добавить роль
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownRoleButton">
+                                            <label class="dropdown-item">
+                                                <button class="btn btn-link dropdown-toggle role" type="button" id="add" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                    + Добавить роль
+                                                </button>
+
+                                                <div class="dropdown-menu" aria-labelledby="add">
+                                                    <textarea class="form-control1" placeholder="Leave a comment here" id="floatingTextarea"></textarea>
+                                                    <label for="floatingTextarea">Comments</label>
+                                                </div>
+                                            </label>
+
+
+                                            <label class="dropdown-item">
+                                                <input type="radio" name="roleOptions" value="Тестировщик">
+                                                Тестировщик
+                                            </label>
+                                            <label class="dropdown-item">
+                                                <input type="radio" name="roleOptions" value="Менеджер">
+                                                Менеджер
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                       
+                        
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="tasks" role="tabpanel" aria-labelledby="tasks-tab">2...</div>
+            <div class="tab-pane fade" id="members" role="tabpanel" aria-labelledby="members">3...</div>
+            <div class="tab-pane fade" id="Storage" role="tabpanel" aria-labelledby="Storage">4...</div>
+          </div>
+              
+              
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"  crossorigin="anonymous"></script>
+   
+
+    </body>
+</html>
