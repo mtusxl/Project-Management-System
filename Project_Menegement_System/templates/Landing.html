@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome Team Synergy</title>
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+        crossorigin="anonymous">
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #f2f2f2;
+            padding: 20px 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .logo {
+            display: inline-block;
+            margin-right: 20px;
+        }
+
+        nav {
+            float: right;
+        }
+
+        nav ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        nav li {
+            display: inline-block;
+            margin-left: 20px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #333;
+        }
+
+        .hero {
+            background-color: #fff;
+            padding: 80px 0;
+        }
+
+        .hero-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .hero-text {
+            flex: 1;
+        }
+
+        .hero-text h1 {
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+
+        .hero-text p {
+            font-size: 1.2em;
+            line-height: 1.6;
+        }
+
+        .hero-button {
+            display: inline-block;
+            padding: 15px 30px;
+            background-color: #007bff;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+
+        .hero-image {
+            flex: 1;
+            text-align: center;
+        }
+
+        .hero-image img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .features {
+            padding: 80px 0;
+        }
+
+        .features-title {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .feature {
+            padding: 30px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .feature h3 {
+            margin-bottom: 10px;
+        }
+
+        .feature p {
+            line-height: 1.6;
+        }
+
+        .testimonials {
+            padding: 80px 0;
+            background-color: #f8f8f8;
+        }
+
+.testimonials-title {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.testimonials-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+}
+
+.testimonial {
+    padding: 30px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.testimonial-author {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.testimonial-author img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-bottom: 10px;
+}
+
+.testimonial-author h4 {
+    margin-bottom: 5px;
+}
+
+.testimonial-author p {
+    font-style: italic;
+    color: #888;
+}
+
+footer {
+    background-color: #333;
+    color: #fff;
+    padding: 40px 0;
+}
+
+footer .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+footer .copyright {
+    flex: 1;
+}
+
+footer .social {
+    flex: 1;
+    text-align: right;
+}
+
+footer .social a {
+    display: inline-block;
+    margin-left: 10px;
+    color: #fff;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+    <div class="logo">
+        <img src="logo.png" alt="Logo">
+    </div>
+    <nav>
+        <ul>
+            <li><a href="#">Product</a></li>
+            <li><a href="#">Cases</a></li>
+            <li><a href="#">Cost</a></li>
+            <li><a href="#">Resources</a></li>
+            <li><a href="#">Ru</a></li>
+            <li><a href="#">Login</a></li>
+            <li><a href="#" class="hero-button">Demo version</a></li>
+        </ul>
+    </nav>
+</div>
+
+<section class="hero">
+<div class="container">
+    <div class="hero-content">
+        <div class="hero-text">
+            <h1>Team Synergy</h1>
+            <p>Быстро составьте календарный план работ и точно оцените их стоимость в рамках всего жизненного цикла проекта.</p>
+            <a href="login/" class="hero-button">Начать</a>
+        </div>
+        <div class="hero-image">
+            <img src="hero-image.png" alt="Hero Image">
+        </div>
+    </div>
+</div>
+</section>
+<section class="features">
+<div class="container">
+    <h2 class="features-title">Как это работает</h2>
+    <div class="features-grid">
+        <div class="feature">
+            <h3>Планируйте свою работу</h3>
+            <p>Благодарим вас за проявленный интерес к нашей компании и добро пожаловать в нашу компанию. Ничего легкого.</p>
+        </div>
+        <div class="feature">
+            <h3>Оценка затрат</h3>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla facilisi.</p>
+        </div>
+        <div class="feature">
+            <h3>Distribute tasks among employees</h3>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla facilisi.</p>
+        </div>
+        <div class="feature">
+            <h3>Manage processes</h3>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla facilisi.</p>
+        </div>
+        <div class="feature">
+            <h3>Track key performance indicators</h3>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla facilisi.</p>
+        </div>
+        <div class="feature">
+            <h3>Control programs</h3>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla facilisi.</p>
+        </div>
+        <div class="feature">
+            <h3>Popular project management features</h3>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla facilisi.</p>
+        </div>
+    </div>
+</div>
+</section>
+<section class="testimonials">
+<div class="container">
+    <h2 class="testimonials-title">Testimonials</h2>
+    <div class="testimonials-grid">
+        <div class="testimonial">
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla facilisi. Maecenas sed diam eget risus varius blandit sit amet non magna.</p>
+            <div class="testimonial-author">
+                <img src="testimonial-author-1.jpg" alt="Author Image">
+                <h4>Kirill Dautov</h4>
+                <p>Director of ALTNAUS Group</p>
+            </div>
+        </div>
+        <div class="testimonial">
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla facilisi. Maecenas sed diam eget risus varius blandit sit amet non magna.</p>
+            <div class="testimonial-author">
+                <img src="testimonial-author-2.jpg" alt="Author Image">
+                <h4>Denis Turshev</h4>
+                <p>Director of Auto-Otkrytie</p>
+            </div>
+        </div>
+        <div class="testimonial">
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla facilisi. Maecenas sed diam eget risus varius blandit sit amet non magna.</p>
+            <div class="testimonial-author">
+                <img src="testimonial-author-3.jpg" alt="Author Image">
+                <h4>Igor Elovich</h4>
+                <p>Commercial Director and Expert</p>
+            </div>
+        </div>
+    </div>
+</div>
+</section>
+<footer>
+<div class="container">
+    <div class="copyright">
+        <p>&copy; 2023 Timetta</p>
+    </div>
+    <div class="social">
+        <a href="#">Facebook</a>
+        <a href="#">Twitter</a>
+        <a href="#">Instagram</a>
+    </div>
+</div>
+</footer>
+</body>
+</html>
