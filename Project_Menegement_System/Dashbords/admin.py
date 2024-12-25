@@ -1,3 +1,4 @@
 from django.contrib import admin
+from Dashbords.models import Dashbord
 
-# Register your models here.
+admin.site.register(Dashbord)

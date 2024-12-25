@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Создать проект</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h2 class="mb-4">Создать проект</h2>
+        <form action="{% url 'create_project' %}" method="post">
+            {% csrf_token %}
+            <!-- Название проекта -->
+            <div class="mb-3">
+                <label for="project_name" class="form-label">Название проекта</label>
+                <input type="text" class="form-control" id="project_name" name="project_name" placeholder="Введите название проекта" required>
+            </div>
+            
+            <!-- Описание проекта -->
+            <div class="mb-3">
+                <label for="project_description" class="form-label">Описание проекта</label>
+                <textarea class="form-control" id="project_description" name="project_description" rows="4" placeholder="Введите описание проекта" required></textarea>
+            </div>
+            
+            <!-- Автор проекта -->
+            <div class="mb-3">
+                <label for="project_author" class="form-label">Автор</label>
+                <select class="form-select" id="project_author" name="project_author" required>
+                    <option value="">Выберите автора</option>
+                    {% for member in members %}
+                        <option value="{{ member.id }}">{{ member.full_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <!-- Члены проекта -->
+            <div class="mb-3">
+                <label class="form-label">Члены проекта</label>
+                <div id="members-list" class="mb-2">
+                    <!-- Выбранные члены будут отображаться здесь -->
+                </div>
+                <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#addMemberModal">Добавить члена</button>
+            </div>
+            
+            <!-- Кнопка создания проекта -->
+            <button type="submit" class="btn btn-primary">Создать проект</button>
+        </form>
+    </div>
+
+    <!-- Модальное окно для добавления члена -->
+    <div class="modal fade" id="addMemberModal" tabindex="-1" aria-labelledby="addMemberModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addMemberModalLabel">Добавить члена проекта</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addMemberForm">
+                        <div class="mb-3">
+                            <label for="member_first_name" class="form-label">Имя</label>
+                            <input type="text" class="form-control" id="member_first_name" placeholder="Введите имя" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="member_last_name" class="form-label">Фамилия</label>
+                            <input type="text" class="form-control" id="member_last_name" placeholder="Введите фамилию" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="member_middle_name" class="form-label">Отчество</label>
+                            <input type="text" class="form-control" id="member_middle_name" placeholder="Введите отчество">
+                        </div>
+                        <div class="mb-3">
+                            <label for="member_email" class="form-label">Почта</label>
+                            <input type="email" class="form-control" id="member_email" placeholder="Введите почту" required>
+                        </div>
+                        <button type="button" class="btn btn-primary" id="addMemberBtn">Добавить</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Добавление нового члена проекта
+        document.getElementById('addMemberBtn').addEventListener('click', function () {
+            const firstName = document.getElementById('member_first_name').value;
+            const lastName = document.getElementById('member_last_name').value;
+            const middleName = document.getElementById('member_middle_name').value;
+            const email = document.getElementById('member_email').value;
+
+            if (firstName && lastName && email) {
+                const fullName = `${lastName} ${firstName} ${middleName}`;
+                const membersList = document.getElementById('members-list');
+
+                const memberItem = document.createElement('div');
+                memberItem.classList.add('mb-2');
+                memberItem.innerHTML = `
+                    <span>${fullName} (${email})</span>
+                    <input type="hidden" name="members[]" value="${fullName}|${email}">
+                `;
+
+                membersList.appendChild(memberItem);
+
+                // Очистка формы и закрытие модального окна
+                document.getElementById('addMemberForm').reset();
+                const modal = bootstrap.Modal.getInstance(document.getElementById('addMemberModal'));
+                modal.hide();
+            } else {
+                alert('Пожалуйста, заполните все обязательные поля!');
+            }
+        });
+    </script>
+</body>
+</html>
