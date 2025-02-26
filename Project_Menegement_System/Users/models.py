@@ -10,9 +10,6 @@ class User(AbstractUser):
         blank=True, 
         related_name='users'  # Уникальное имя обратной связи
     )
-
-
-
     def __str__(self):
         return self.username
 

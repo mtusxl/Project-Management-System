@@ -26,7 +26,7 @@
             <!-- Автор проекта -->
             <div class="mb-3">
                 <label for="project_author" class="form-label">Автор</label>
-                <select class="form-select" id="project_author" name="project_author" required>
+                <select class="form-select" id="project_author" name="project_author">
                     <option value="">Выберите автора</option>
                     {% for member in members %}
                         <option value="{{ member.id }}">{{ member.full_name }}</option>
@@ -37,7 +37,7 @@
             <!-- Члены проекта -->
             <div class="mb-3">
                 <label class="form-label">Члены проекта</label>
-                <div id="members-list" class="mb-2">
+                <div id="members-list" name="members" class="mb-2">
                     <!-- Выбранные члены будут отображаться здесь -->
                 </div>
                 <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#addMemberModal">Добавить члена</button>
