@@ -4,4 +4,5 @@ from Projects.models import Project
 
 @login_required
 def home(request):
-    return render(request, "home.html")
+    latest_projects = Project.objects.all().order_by('-created_at')[:2]
+    return render(request, "home.html", {"latest_projects":latest_projects})

@@ -29,7 +29,7 @@
                 <select class="form-select" id="project_author" name="project_author">
                     <option value="">Выберите автора</option>
                     {% for member in members %}
-                        <option value="{{ member.id }}">{{ member.full_name }}</option>
+                        <option value="{{ member.id }}">{{ member.name }}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -41,6 +41,13 @@
                     <!-- Выбранные члены будут отображаться здесь -->
                 </div>
                 <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#addMemberModal">Добавить члена</button>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Задачи проекта</label>
+                <div id="tasks-section">
+                    <!-- Задачи будут добавляться сюда динамически -->
+                </div>
+                <button type="button" class="btn btn-secondary" id="add-task">Добавить задачу</button>
             </div>
             
             <!-- Кнопка создания проекта -->
@@ -74,6 +81,9 @@
                             <label for="member_email" class="form-label">Почта</label>
                             <input type="email" class="form-control" id="member_email" placeholder="Введите почту" required>
                         </div>
+
+                        
+                        
                         <button type="button" class="btn btn-primary" id="addMemberBtn">Добавить</button>
                     </form>
                 </div>
@@ -110,6 +120,26 @@
             } else {
                 alert('Пожалуйста, заполните все обязательные поля!');
             }
+        });
+        //Add new task
+        let taskCount = 0;
+
+        document.getElementById('add-task').addEventListener('click', function() {
+            taskCount++;
+            const taskForm = `
+                <div class="task-form mb-3">
+                    <h5>Задача ${taskCount}</h5>
+                    <div class="mb-3">
+                        <label for="task_title_${taskCount}" class="form-label">Название задачи</label>
+                        <input type="text" class="form-control" id="task_title_${taskCount}" name="task_title_${taskCount}" placeholder="Введите название задачи" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="task_description_${taskCount}" class="form-label">Описание задачи</label>
+                        <textarea class="form-control" id="task_description_${taskCount}" name="task_description_${taskCount}" rows="2" placeholder="Введите описание задачи"></textarea>
+                    </div>
+                </div>
+            `;
+            document.getElementById('tasks-section').insertAdjacentHTML('beforeend', taskForm);
         });
     </script>
 </body>

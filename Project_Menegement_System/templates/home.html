@@ -180,30 +180,21 @@
         </div>
 
         <!-- Блоки с проектами и задачами -->
-        <h4 class="section-header">Current Projects</h4>
+        <h4 class="section-header">Последние проекты</h4>
         <div class="row">
-            <div class="col-md-6">
-                <div class="card p-3 mb-3">
-                    <h5 class="card-title">Project A</h5>
-                    <p class="card-text"><strong>Manager:</strong> John Doe</p>
-                    <p class="card-text"><strong>Deadline:</strong> 2024-12-31</p>
-                    <p class="card-text"><strong>Status:</strong> In Progress</p>
-                    <div class="progress">
-                        <div class="progress-bar" style="width: 70%;" role="progressbar"></div>
+            {% for project in latest_projects %}
+                <div class="col-md-6">
+                
+                    <div class="card p-3 mb-3">
+                        <h5 class="card-title">{{ project.name }}</h5>
+                        <p class="card-text"><strong>Auhtor:</strong> {{ project.author }}</p>
+                        <p class="card-text"><strong>Created at:</strong> {{ project.created_at }}</p>
+                        <div class="progress">
+                            <div class="progress-bar" style="width: 70%;" role="progressbar"></div>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-md-6">
-                <div class="card p-3 mb-3">
-                    <h5 class="card-title">Project B</h5>
-                    <p class="card-text"><strong>Manager:</strong> Jane Smith</p>
-                    <p class="card-text"><strong>Deadline:</strong> 2024-12-20</p>
-                    <p class="card-text"><strong>Status:</strong> In Progress</p>
-                    <div class="progress">
-                        <div class="progress-bar" style="width: 50%;" role="progressbar"></div>
-                    </div>
-                </div>
-            </div>
+            {% endfor %}
         </div>
 
         <h4 class="section-header">Current Tasks</h4>

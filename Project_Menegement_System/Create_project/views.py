@@ -2,7 +2,7 @@ from django.shortcuts import render
 from Projects.models import Project
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
-from Users.models import User
+from Tasks.models import Task
 
 @login_required
 def Create_project(request):
@@ -22,6 +22,9 @@ def Create_project(request):
         members = User.objects.filter(id__in=members)
         project.members.set(members)
         request.user.projects.add(project)
+
+        
+
         
    
     return  render(request, 'project_form.html')
