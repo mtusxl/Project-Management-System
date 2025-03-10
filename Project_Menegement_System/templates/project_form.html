@@ -138,6 +138,7 @@
                         <textarea class="form-control" id="task_description_${taskCount}" name="task_description_${taskCount}" rows="2" placeholder="Введите описание задачи"></textarea>
                     </div>
                 </div>
+                <input type="hidden" name="task_count" value="${taskCount}">
             `;
             document.getElementById('tasks-section').insertAdjacentHTML('beforeend', taskForm);
         });

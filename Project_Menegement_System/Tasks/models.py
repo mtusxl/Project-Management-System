@@ -8,7 +8,7 @@ class Task(models.Model):
                       ('done', 'Done')]
     description = models.TextField(blank=True)
     project = models.ForeignKey("Projects.Project", on_delete=models.CASCADE, related_name='tasks')
-    assigned_to = models.ForeignKey("Users.User", on_delete=models.CASCADE, related_name='tasks')
+    assigned_to = models.ForeignKey("Users.User", on_delete=models.CASCADE, related_name='tasks', null=True, blank=True)
     status = models.CharField(max_length=50, choices=STATUS_CHOISES, default='to_do')
     due_date = models.DateField(null=True, blank=True)
     created_at = models.DateField(auto_now_add=True)

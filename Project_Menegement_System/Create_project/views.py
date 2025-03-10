@@ -7,7 +7,6 @@ from Tasks.models import Task
 @login_required
 def Create_project(request):
     if request.method=="POST":
-        User = get_user_model()
         
         name=request.POST.get("project_name")
         description = request.POST.get("project_description")
@@ -19,9 +18,23 @@ def Create_project(request):
             author=request.user
         )
         project.save()
-        members = User.objects.filter(id__in=members)
-        project.members.set(members)
+        project.members.add(request.user)
+        project.members.add(*members)
         request.user.projects.add(project)
+
+        task_count = int(request.POST.get('task_count', 0))
+        for i in range(1, task_count + 1):
+            task_title = request.POST.get(f'task_title_{i}')
+            task_description = request.POST.get(f'task_description_{i}')
+            if task_title:
+                task = Task(
+                    name=task_title,
+                    description=task_description,
+                    project=project
+                )
+                task.save()
+
+
 
         
 
