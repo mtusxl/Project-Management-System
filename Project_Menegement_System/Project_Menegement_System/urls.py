@@ -7,6 +7,6 @@ urlpatterns = [
     path('', include('Dashbords.urls'), name='Dashbords'),
     path('', include('Tasks.urls'), name='tasks'),
     path('', include('Users.urls'), name='users'),
-    path('projects', include('Projects.urls'), name='projects'),
+    path('', include('Projects.urls'), name='projects'),
     path('', include("Create_project.urls"), name='create_project'),
 ]

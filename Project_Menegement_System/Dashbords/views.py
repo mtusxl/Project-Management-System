@@ -10,6 +10,7 @@ def home(request):
     latest_projects = Project.objects.filter(Q(author=request.user) | Q(members=request.user)).order_by('-created_at')[:2]
     all_projects = Project.objects.filter(Q(author=request.user) | Q(members=request.user)).all()
     latest_tasks = Task.objects.filter(Q(status="in_progress") |Q( status="to_do")).order_by("-created_at")[:6]
+  
 
     return render(request, "home.html", {"latest_projects":latest_projects, 
                                          "latest_tasks":latest_tasks, 

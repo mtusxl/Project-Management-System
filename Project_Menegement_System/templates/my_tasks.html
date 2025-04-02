@@ -1,230 +1,42 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Мои задачи</title>
-    <link
-    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
-    rel="stylesheet"
-    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
-    crossorigin="anonymous">
+{% extends 'base.html' %}
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.min.js"></script>
+{% block title %}Мои задачи{% endblock %}
 
+{% block content %}
+<div class="container mt-4">
+    <h1 class="text-center">Мои задачи</h1>
 
-
-      
-    <style>
-      body {
-      margin: 0;
-      padding: 0;
-      background-color: #18191A;
-      color: #fff;
-      font-family: 'Roboto', sans-serif;}
-
-          /* style.css */
-      .card {
-      border: 1px solid #ddd;
-      
-      }
-
-      .card-header {
-      background-color: #f8f9fa;
-      border-bottom: 1px solid #ddd;
-      }
-
-      .task-item {
-      cursor: pointer;
-
-      }
-
-      .task-item:hover {
-      background-color: #959595;
-      }
-
-      .task-item .fa-check-circle {
-      color: #28a745;
-      }
-
-      .task-item .fa-circle {
-      color: #dc3545;
-      }
-
-     
-
-      .task-text.text-dark {
-      /* Цвет текста, когда чекбокс активен */
-      color: #d80000;
-      }
-
-
-      .task-item .fa-circle {
-      color: #dc3545;
-      }
-
-      .task-text{
-        align-content: center;
-      }
-    .card-header{
-      background-color: aquamarine;
-    }
-    .list-group, .task-item{
-      background-color: #28a745;
-    }
-
-    #taskModalLabel,#task-deadline, #task-project, #task-members, #task-comments{
-      color:#18191A;
-    }
-
-  </style>  
-
-
-    <body>
-      <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="mainNav">
-            <ul id="menu" class="navbar-nav mr-auto">
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <i class="fas fa-bars"></i> Меню
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <ul>
-                            <li><a href="home.html" class="active"><i class="fas fa-home"></i> Главная</a></li>
-                            <li><a href="my_tasks.html"><i class="fas fa-tasks"></i> Мои задачи</a></li>
-                            <li><a href="#"><i class="fas fa-chart-bar"></i> Аналитика</a>
-                                <ul>
-                                    <li><a href="#"><i class="fas fa-chart-line"></i> Отчеты</a></li>
-                                    <li><a href="#"><i class="fas fa-folder-open"></i> Портфели</a></li>
-                                    <li><a href="#"><i class="fas fa-bullseye"></i> Цели</a></li>
-                                </ul>
-                            </li>
-                            <li><a href="#"><i class="fas fa-project-diagram"></i> Проекты</a>
-                                <ul>
-                                    <li><a href="#"><i class="fas fa-folder-open"></i>none</a></li>
-                                    <li><a href="#"><i class="fas fa-database"></i> None</a></li>
-                                </ul>
-                            </li>
-                        </ul>
-                    </div>
-                </li>
-                <li class="nav-item">
-                    <a  class="nav-link" href="#">
-                        <i class="fas fa-plus-circle"></i> Создать
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="#">Проект</a>
-                        <a class="dropdown-item" href="#">Задача</a>
-                    </div>
-                </li>
-            </ul>
-            <a class="navbar-brand" href="#">Team Synergy</a>
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <i class="fas fa-user-circle"></i> Аккаунт
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="#">Профиль</a>
-                        <a class="dropdown-item" href="#">Выход</a>
-                    </div>
-                </li>
-            </ul>
-        </div>
-    </nav>
-    <div class="container mt-4">
-      <h1 class="text-center">Мои задачи</h1>
-  
-      <div class="row">
+    <div class="row">
         <div class="col-md-4">
-          <div class="card">
-            <div class="card-header">
-              <h5 class="card-title">Прошедшие задачи</h5>
-            </div>
-            <ul class="list-group list-group-flush" id="past-tasks">
-              <!-- Задачи будут добавлены здесь -->
-            </ul>
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div class="card">
-            <div class="card-header">
-              <h5 class="card-title">Сегодня</h5>
-            </div>
-            <ul class="list-group list-group-flush" id="today-tasks">
-              <!-- Задачи будут добавлены здесь -->
-            </ul>
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div class="card">
-            <div class="card-header">
-              <h5 class="card-title">Будущие задачи</h5>
-            </div>
-            <ul class="list-group list-group-flush" id="future-tasks">
-              <!-- Задачи будут добавлены здесь -->
-            </ul>
-          </div>
-        </div>
-      </div>
-  
-      <div class="modal fade" id="taskModal" tabindex="-1" role="dialog" aria-labelledby="taskModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document" style="width: 55%;">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="taskModalLabel"></h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div class="modal-body">
-              <div class="row">
-                <div class="col-md-6">
-                  <p><span id="task-deadline"></span></p>
-                  <p><span id="task-project"></span></p>
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">Прошедшие задачи</h5>
                 </div>
-                <div class="col-md-6">
-                  <p><span id="task-members"></span></p>
-                </div>
-              </div>
-  
-              <h6 class="mt-4">Комментарии:</h6>
-              <ul class="list-group list-group-flush" id="task-comments">
-                <!-- Комментарии будут добавлены здесь -->
-              </ul>
-  
-              <div class="form-group mt-3">
-                <label for="task-comment">Добавить комментарий:</label>
-                <textarea class="form-control" id="task-comment" rows="3"></textarea>
-              </div>
-  
-              <div class="form-group">
-                <label for="task-access">Доступ:</label>
-                <select class="form-control" id="task-access">
-                  <option value="public">Публичный</option>
-                  <option value="private">Приватный</option>
-                </select>
-              </div>
+                <ul class="list-group list-group-flush" id="past-tasks">
+                    <!-- Задачи будут добавлены здесь -->
+                </ul>
             </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
-              <button type="button" class="btn btn-primary" id="save-comment">Сохранить</button>
-            </div>
-          </div>
         </div>
-      </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">Сегодня</h5>
+                </div>
+                <ul class="list-group list-group-flush" id="today-tasks">
+                    <!-- Задачи будут добавлены здесь -->
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">Будущие задачи</h5>
+                </div>
+                <ul class="list-group list-group-flush" id="future-tasks">
+                    <!-- Задачи будут добавлены здесь -->
+                </ul>
+            </div>
+        </div>
     </div>
-  
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="script.js"></script>
-  </body>
-  </html>
+</div>
+{% endblock %}

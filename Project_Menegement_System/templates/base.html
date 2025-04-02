@@ -1,89 +1,161 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Мои задачи{% endblock %}</title>
-    <!-- Подключение Bootstrap и других стилей -->
-    <link
-        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
-        rel="stylesheet"
-        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
-        crossorigin="anonymous">
-   
+    <title>{% block title %}Team Synergy{% endblock %}</title>
+    <!-- Подключение Bootstrap и FontAwesome -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.min.js"></script>
-
     <style>
-        .dropdown-menu{
-            left: 0;
-            height: 100vh;
-            width: 100vh;
-            background-color: #222;
-            color: #fff;
-            transition: transform 0.3s ease; /* Анимация перехода */
-            z-index: 100; /* Устанавливаем высокий приоритет для z-index */
+        body {
+            background-color: #121212; /* Тёмный фон */
+            color: #e0e0e0; /* Светлый текст */
+            font-family: 'Roboto', sans-serif;
         }
+
+        .navbar {
+            background-color: #1f1f1f; /* Цвет навигационной панели */
+        }
+
+        .btn-success {
+            background-color: #4CAF50; /* Светло-зелёный цвет кнопок */
+            border-color: #4CAF50;
+        }
+
+        .btn-success:hover {
+            background-color: #45a049; /* Темнее при наведении */
+            border-color: #45a049;
+        }
+
+        .dropdown-menu {
+            background-color: #1f1f1f; /* Цвет выпадающего меню */
+            color: #fff;
+        }
+
+        .dropdown-item {
+            color: #fff;
+        }
+
+        .dropdown-item:hover {
+            background-color: #333; /* Цвет при наведении */
+        }
+
+        .card {
+            color: #e0e0e0;
+            background-color: #1e1e1e; /* Цвет карточек */
+            border: 1px solid #333;
+            border-radius: 8px;
+        }
+
+        .list-group-item {
+            background-color: #1e1e1e; /* Цвет элементов списка */
+            border: 1px solid #333;
+            color: #e0e0e0;
+        }
+
+        .list-group-item:hover {
+            background-color: #333; /* Цвет при наведении */
+        }
+        .form-control
+        {
+            color:#e0e0e0;
+            background-color: #1F1F1F;
+            border-color:#333;
+        }
+        .project-description
+        {
+            color: #e0e0e0;
+            background-color: #121212;
+            border: 0px;
+        }
+        .form-control:hover, .form-control:focus, .project-description:focus, .project-description:hover{
+            color: #e0e0e0;
+            border-color: #45a049;
+            background-color: #333;
+        }
+
+.save-btn {
+  background-color: #4CAF50; /* Более яркий зелёный */
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 24px;
+  font-size: 16px;
+  font-weight: 500; /* Полужирный текст */
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.save-btn:hover {
+  background-color: #27ae60; /* Тёмно-зелёный */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* Тень приподнимается */
+}
+
+.save-btn:active {
+  transform: scale(0.96); /* Эффект нажатия */
+}
     </style>
 </head>
-
-
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-   
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="mainNav">
-        <ul class="navbar-nav mr-auto">
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <i class="fas fa-bars"></i> Меню
-                </a>
-                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                    <ul>
-                        <li><a href="home.html" class="active"><i class="fas fa-home"></i> Главная</a></li>
-                        <li><a href="my_tasks.html"><i class="fas fa-tasks"></i> Мои задачи</a></li>
-                        <li><a href="#"><i class="fas fa-chart-bar"></i> Аналитика</a>
-                            <ul>
-                                <li><a href="#"><i class="fas fa-chart-line"></i> Отчеты</a></li>
-                                <li><a href="#"><i class="fas fa-folder-open"></i> Портфели</a></li>
-                                <li><a href="#"><i class="fas fa-bullseye"></i> Цели</a></li>
-                            </ul>
-                        </li>
-                        <li><a href="#"><i class="fas fa-project-diagram"></i> Проекты</a>
-                            <ul>
-                                <li><a href="#"><i class="fas fa-folder-open"></i>none</a></li>
-                                <li><a href="#"><i class="fas fa-database"></i> None</a></li>
-                            </ul>
-                        </li>
+<body>
+    <!-- Навигационное меню -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="dropdown">
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fa-solid fa-bars"></i> <!-- Иконка меню -->
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                <li><a class="dropdown-item" href="/home">Home</a></li>
+                <li><a class="dropdown-item" href="/projects">Projects</a></li>
+                <li><a class="dropdown-item" href="/tasks">Tasks</a></li>
+                <li><a class="dropdown-item" href="#">Settings</a></li>
+            </ul>
+        </div>
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/home">Team Synergy</a>
+            <button class="navbar-toggler menu-icon" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="d-flex align-items-center">
+                <!-- Кнопка "Создать" -->
+                <div class="dropdown me-3">
+                    <button class="btn btn-success dropdown-toggle d-flex align-items-center" type="button" id="createDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fa-solid fa-plus me-2"></i> Создать
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="createDropdown">
+                        <li><a class="dropdown-item" href="/create_project/">Проект</a></li>
+                        <li><a class="dropdown-item" href="/create_task/">Задачу</a></li>
                     </ul>
                 </div>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#">
-                    <i class="fas fa-plus-circle"></i> Создать
-                </a>
-                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                    <a class="dropdown-item" href="#">Проект</a>
-                    <a class="dropdown-item" href="#">Задача</a>
-                </div>
-            </li>
-        </ul>
-        <a class="navbar-brand" href="#">Team Synergy</a>
-        <ul class="navbar-nav ml-auto">
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <i class="fas fa-user-circle"></i> Аккаунт
-                </a>
-                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                    <a class="dropdown-item" href="#">Профиль</a>
-                    <a class="dropdown-item" href="#">Выход</a>
-                </div>
-            </li>
-        </ul>
-    </div>
-</nav>
+                <!--<form class="d-flex">
+                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                    <button class="btn btn-outline-light" type="submit">Search</button>
+                </form>-->
+            </div>
+            <div class="dropdown">
+                <button class="btn btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    Account
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="#">Profile</a></li>
+                    <li>
+                        <form method="post" action="{% url 'logout' %}">
+                            {% csrf_token %}
+                            <button class="dropdown-item" type="submit">Выйти</button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
 
+    <!-- Основное содержимое -->
+    <div class="container mt-4">
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <!-- Подключение Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+</html>

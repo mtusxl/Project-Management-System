@@ -8,7 +8,7 @@ class User(AbstractUser):
     projects = models.ManyToManyField(
         "Projects.Project", 
         blank=True, 
-        related_name='users'  # Уникальное имя обратной связи
+        related_name='users'
     )
     def __str__(self):
         return self.username

@@ -6,3 +6,4 @@ from Projects.models import Project
 @login_required
 def all_tasks(request):
     return render(request, "my_tasks.html")
+
