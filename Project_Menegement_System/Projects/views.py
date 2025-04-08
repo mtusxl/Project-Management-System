@@ -7,8 +7,14 @@ from .models import Project
 def project_list(request, slug):
 
     project = get_object_or_404(Project, slug=slug)
-    tasks = project.tasks.all()
+    tasks = project.tasks.filter(assigned_to=request.user)
+    tasks_todo = tasks.filter(status="to_do")
+    tasks_in_progress = tasks.filter(status="in_progress")
+    tasks_done = tasks.filter(status="done")
     
    
     return render(request, "project.html", {"project":project,
-                                            "tasks":tasks})
+                                            "tasks":tasks,
+                                            "tasks_todo":tasks_todo,
+                                            "tasks_in_progress":tasks_in_progress,
+                                            "tasks_done":tasks_done})

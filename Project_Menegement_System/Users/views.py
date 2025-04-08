@@ -12,7 +12,7 @@ def register(request):
         form = RegistrationForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('home')  # Или другая страница после успешной регистрации
+            return redirect('home') 
         else:
             form = RegistrationForm()
     return render(request, 'register.html', {'form': RegistrationForm})
@@ -23,6 +23,7 @@ def user_login(request):
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
             user = form.get_user()
+            logout(request)
             login(request, user)
             return redirect('/')
     else:
@@ -34,3 +35,6 @@ def user_logout(request):
     logout(request)
     messages.success(request, "Вы успешно вышли из системы.")
     return redirect('login')
+
+def profile(request):
+    return render(request, "profile.html")

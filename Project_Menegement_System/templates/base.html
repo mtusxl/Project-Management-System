@@ -95,6 +95,43 @@
 .save-btn:active {
   transform: scale(0.96); /* Эффект нажатия */
 }
+
+
+.kanban-board {
+        margin-bottom: 20px;
+      
+    }
+    .kanban-column {
+        min-height: 500px;
+        background-color: #474747;
+        border-radius: 0 0 5px 5px;
+        overflow-y: auto;
+        
+    }
+    .task-card {
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+    .task-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .task-meta {
+        display: flex;
+        gap: 5px;
+        flex-wrap: wrap;
+        margin-top: 10px;
+    }
+    .dropdown-toggle::after {
+        display: none;
+    }
+    .text-center p{
+        color:  white;
+    }
+
+ 
+        
+  
     </style>
 </head>
 <body>

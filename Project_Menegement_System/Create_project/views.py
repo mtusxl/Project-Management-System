@@ -34,7 +34,9 @@ def Create_project(request):
                 task = Task(
                     name=task_title,
                     description=task_description,
-                    project=project
+                    project=project,
+                    assigned_to = request.user
+
                 )
                 task.save()
 
