@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from .models import User
 from django.contrib.auth import login, aauthenticate, logout
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib import messages
 
@@ -30,11 +31,25 @@ def user_login(request):
         form = AuthenticationForm()
     return render(request, 'autho.html', {'form': form})
 
-
+@login_required
 def user_logout(request):
     logout(request)
     messages.success(request, "Вы успешно вышли из системы.")
     return redirect('login')
 
+@login_required
 def profile(request):
+    user = request.user
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        first_name = request.POST.get("name")
+        last_name = request.POST.get("lastname")
+        email = request.POST.get('email')
+
+        user.username = username
+        user.first_name = first_name
+        user.last_name = last_name
+        user.email = email
+        user.save()
+        return redirect("profile")
     return render(request, "profile.html")
