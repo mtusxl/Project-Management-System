@@ -1,13 +1,11 @@
 from django.urls import path
-from django.contrib.auth.views import LoginView
 from . import views
 
 urlpatterns = [
     path('register/', views.register, name='register'),
-    path('login/', LoginView.as_view(template_name='autho.html'), name='login'),
+    path('login/', views.user_login, name='login'),
     path('logout/', views.user_logout, name='logout'),
-    path('user/profile', views.profile, name="profile")
+    path('user/profile', views.profile, name="profile"),
+    path('user/delete', views.del_user, name="delete_user")
     
-    # Профиль пользователя
-    #path('profile/<str:username>/', views.profile, name='profile'),
 ]

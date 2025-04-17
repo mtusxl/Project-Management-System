@@ -21,12 +21,12 @@ def register(request):
 
 def user_login(request):
     if request.method == 'POST':
-        form = AuthenticationForm(request, data=request.POST)
-        if form.is_valid():
-            user = form.get_user()
-            logout(request)
-            login(request, user)
-            return redirect('/')
+            form = AuthenticationForm(request, data=request.POST)
+            if form.is_valid():
+                user = form.get_user()
+                logout(request)
+                login(request, user)
+                return redirect('home')
     else:
         form = AuthenticationForm()
     return render(request, 'autho.html', {'form': form})
@@ -40,6 +40,8 @@ def user_logout(request):
 @login_required
 def profile(request):
     user = request.user
+    user_projects = request.user.projects.all()
+    
     if request.method == 'POST':
         username = request.POST.get('username')
         first_name = request.POST.get("name")
@@ -52,4 +54,11 @@ def profile(request):
         user.email = email
         user.save()
         return redirect("profile")
-    return render(request, "profile.html")
+    return render(request, "profile.html", {"projects":user_projects})
+
+@login_required
+def del_user(request):
+    user = request.user
+    logout(request)
+    user.delete()
+    return redirect("login")

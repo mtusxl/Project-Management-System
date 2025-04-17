@@ -35,7 +35,8 @@ INSTALLED_APPS = [
     'Tasks',
     'Dashbords',
     'Index', 
-    'Create_project'
+    'Create_project',
+    "widget_tweaks"
 ]
 
 MIDDLEWARE = [

@@ -21,7 +21,7 @@
         <div class="col-md-4">
             <div class="card text-center p-3">
                 <h5 class="card-title">Завершённые задачи</h5>
-                <p class="card-text">0</p>
+                <p class="card-text">Всего: {{ done_tasks }}</p>
             </div>
         </div>
     </div>
@@ -31,11 +31,11 @@
         {% for project in latest_projects %}
             <div class="col-md-6">
                 <div class="card p-3 mb-3">
-                    <a href="{% url 'project' project.slug %}" class="card-title">{{ project.name }}</a>
-                    <p class="card-text"><strong>Автор:</strong> {{ project.author }}</p>
-                    <p class="card-text"><strong>Создан:</strong> {{ project.created_at }}</p>
+                    <a href="{% url 'project' project.0.slug %}" class="card-title">{{ project.0.name }}</a>
+                    <p class="card-text"><strong>Автор:</strong> {{ project.0.author }}</p>
+                    <p class="card-text"><strong>Создан:</strong> {{ project.0.created_at }}</p>
                     <div class="progress">
-                        <div class="progress-bar" style="width: 70%;" role="progressbar"></div>
+                        <div class="progress-bar" style="width: {{project.1}}%;" role="progressbar"></div>
                     </div>
                 </div>
             </div>

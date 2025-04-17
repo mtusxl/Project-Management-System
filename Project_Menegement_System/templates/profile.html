@@ -24,6 +24,14 @@
                         <li class="list-group-item"><strong>Фамилия:</strong> {{ user.last_name|default:"-" }}</li>
                         <li class="list-group-item"><strong>Email:</strong> {{ user.email }}</li>
                         <li class="list-group-item"><strong>Дата регистрации:</strong> {{ user.date_joined|date:"d.m.Y" }}</li>
+                        <li class="list-group-item"><strong>проекты:</strong> 
+                            {% for project in user.projects.all %}
+                            <ul class="list-group mt-2">
+                                <li class="list-group-item"><a href="{% url 'project' project.slug %}" class="card-title">{{ project.name }}</a>
+                            </ul>
+                            {% endfor %}
+                        
+                        </li>
                     </ul>
 
                     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editProfileModal">
@@ -31,6 +39,7 @@
                       </button>
                       
                     <a href="{% url 'logout' %}" class="btn btn-outline-danger ms-2">Выйти</a>
+                    <a href="{% url 'delete_user' %}" class="btn btn-outline-danger ms-2" onclick="confirm('Вы уверены, что хотите удалить аккаунт? Это действие нельзя отменить!')">Удалить аккаунт</a>
                 </div>
             </div>
 

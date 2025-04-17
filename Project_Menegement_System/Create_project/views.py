@@ -14,7 +14,8 @@ def Create_project(request):
         print(f"Slug - {slug}")
         name=request.POST.get("project_name")
         description = request.POST.get("project_description")
-        members = request.POST.getlist("members")
+        members = request.POST.get("members")
+        print(f"members {members}")
         
         project = Project(
             name = name,
