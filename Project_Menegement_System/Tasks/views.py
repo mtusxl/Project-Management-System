@@ -8,16 +8,7 @@ from django.http import JsonResponse
 from .models import Task
 from Projects.models import Project
 
-@login_required
-def all_tasks(request):
-    return render(request, "my_tasks.html")
 
-# Функция: Перевести задачу в работу
-def task_in_progress(request, task_id):
-    task = get_object_or_404(Task, id=task_id)
-    task.status = "in_progress"
-    task.save()
-    return JsonResponse({'success': True}) 
 
 def edit_task(request, task_id):
     if request.method == 'POST':
