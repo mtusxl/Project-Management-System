@@ -2,6 +2,7 @@ from django import forms
 from .models import User
 
 class RegistrationForm(forms.ModelForm):
+    username = forms.CharField(max_length=150, required=True, label="Логин")
     first_name = forms.CharField(max_length=30, required=True, label="Имя")
     last_name = forms.CharField(max_length=30, required=True, label="Фамилия")
     password = forms.CharField(widget=forms.PasswordInput, label="Пароль")
@@ -26,5 +27,5 @@ class RegistrationForm(forms.ModelForm):
         user.first_name = self.cleaned_data.get('first_name')
         user.last_name = self.cleaned_data.get('last_name')
         if commit:
-            user.save()  # Хэширование выполняется автоматически
+            user.save()
         return user
