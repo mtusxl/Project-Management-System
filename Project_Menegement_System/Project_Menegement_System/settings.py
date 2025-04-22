@@ -35,7 +35,6 @@ INSTALLED_APPS = [
     'Tasks',
     'Dashbords',
     'Index', 
-    'Create_project',
     "widget_tweaks"
 ]
 

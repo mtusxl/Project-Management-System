@@ -6,7 +6,6 @@
 <script>
     
     function createTask(event) {
-        event.preventDefault();
 
         const form = document.getElementById('taskForm');
         const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
@@ -87,7 +86,7 @@
     });
 
     document.addEventListener('DOMContentLoaded', function() {
-    // Обработчик для всех форм редактирования
+    // Обработчик для  форм редактирования
     document.querySelectorAll('#EditForm').forEach(form => {
         form.addEventListener('submit', function(e) {
             e.preventDefault(); // Предотвращаем стандартную отправку формы
