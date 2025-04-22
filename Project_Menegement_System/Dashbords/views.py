@@ -5,10 +5,10 @@ from django.db.models import Q
 from Projects.models import Project
 from Tasks.models import Task
 
-@login_required
+@login_required # Только авторизованные пользователи могут попасть на эту страницу
 def home(request):
     latest_projects = Project.objects.filter(Q(author=request.user) | Q(members=request.user)).order_by('-created_at')[:2]
-    all_projects = Project.objects.filter(Q(author=request.user) | Q(members=request.user)).all()
+    all_projects = Project.objects.filter(Q(author=request.user) | Q(members=request.user)).all() 
     all_tasks = Task.objects.filter(assigned_to=request.user).all()
     latest_tasks = Task.objects.filter(Q(assigned_to=request.user) & (Q(status="in_progress") | Q(status="to_do"))).order_by("-created_at")[:6]
     all_tasks_done = Task.objects.filter(Q(assigned_to=request.user) & (Q(status="Done") | Q(status="done")))
@@ -20,10 +20,6 @@ def home(request):
 
         progress = int((len(tasks_done)/len(all_tasks_project))*100) if len(all_tasks_project) > 0 else 0
         projects.append([project, progress])
-  
-        
-
-        
   
     
     return render(request, "home.html", {"latest_projects": projects,
