@@ -21,7 +21,7 @@ def home(request):
         progress = int((len(tasks_done)/len(all_tasks_project))*100) if len(all_tasks_project) > 0 else 0
         projects.append([project, progress])
   
-    
+    print(request.user)
     return render(request, "home.html", {"latest_projects": projects,
                                          "latest_tasks":latest_tasks, 
                                          "tasks_count":len(all_tasks),
