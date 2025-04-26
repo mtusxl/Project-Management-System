@@ -5,51 +5,49 @@
 {% block content %}
 <script>
     
-    function createTask(event) {
+    async function createTask(event) {
+    event.preventDefault();
+    
+    const form = document.getElementById('taskForm');
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    
+    const data = {
+        name: document.getElementById('taskName').value,
+        description: document.getElementById('taskDescription').value,
+        assigned_to: document.getElementById('taskAssignee').value || null,
+        due_date: document.getElementById('taskDueDate').value || null,
+        status: "to_do",
+        project: "{{ project.id }}"  
+    };
 
-        const form = document.getElementById('taskForm');
-        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    try {
+        const response = await fetch("/tasks/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrfToken,
+                "X-Requested-With": "XMLHttpRequest"  // Помечаем как AJAX-запрос
+            },
+            body: JSON.stringify(data),
+        });
 
-        const data = {
-            title: document.getElementById('taskName').value,
-            description: document.getElementById('taskDescription').value,
-            assigned_to: document.getElementById('taskAssignee').value,
-            due_date: document.getElementById('taskDueDate').value,
-        };
+        // Проверяем Content-Type ответа
+        const contentType = response.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+            const text = await response.text();
+            throw new Error(`Ожидался JSON, но получен: ${text.slice(0, 100)}...`);
+        }
 
-            const response = fetch("{% url 'create_task' project.id %}", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRFToken": csrfToken,
-                },
-                body: JSON.stringify(data),
-            });
-
-            if (!response.ok) {
-                throw new Error("Ошибка при создании задачи");
-            }
-
-            const newTask = response.json();
-
-            // 🧩 Добавь новую задачу на страницу (например, в колонку "To Do")
-            const todoColumn = document.getElementById("todo-column");  // используй свой id
-            const taskHtml = `
-                <div class="card mb-2">
-                    <div class="card-body">
-                        <h5 class="card-title">${newTask.title}</h5>
-                        <p class="card-text">${newTask.description || ""}</p>
-                        <p class="text-muted">Срок: ${newTask.due_date || "не указан"}</p>
-                    </div>
-                </div>
-            `;
-            todoColumn.insertAdjacentHTML("beforeend", taskHtml);
-
-            // Очистка и скрытие формы
-            form.reset();
-            toggleTaskForm();
-
+        const newTask = await response.json();
+        
+        // Обновляем страницу после успешного создания
+        window.location.reload();
+        
+    } catch (error) {
+        console.error("Error:", error);
+        alert(`Ошибка: ${error.message}`);
     }
+}
 
     function toggleTaskForm() {
         const form = document.getElementById('taskFormContainer');
@@ -71,8 +69,8 @@
             button.addEventListener("click", function () {
                 const taskId = this.getAttribute("data-task-id");
                 if (confirm("Удалить задачу?")) {
-                    fetch(`/task/${taskId}/delete/`, {
-                        method: "POST",
+                    fetch(`/tasks/${taskId}/`, {
+                        method: "DELETE",
                         headers: { 'X-CSRFToken': '{{ csrf_token }}' }
                     }).then(response => {
                         if (response.ok) {
@@ -85,47 +83,59 @@
         });
     });
 
-    document.addEventListener('DOMContentLoaded', function() {
-    // Обработчик для  форм редактирования
-    document.querySelectorAll('#EditForm').forEach(form => {
-        form.addEventListener('submit', function(e) {
-            e.preventDefault(); // Предотвращаем стандартную отправку формы
+    function setupEditHandlers() {
+    document.querySelectorAll('.edit-task-form').forEach(form => {
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
             
-            // Получаем task_id из скрытого поля
             const taskId = this.querySelector('input[name="task_id"]').value;
+            const csrfToken = this.querySelector('[name=csrfmiddlewaretoken]').value;
             
-            // Собираем данные формы
-            const formData = new FormData(this);
-            
-            // Отправляем данные на сервер
-            fetch(`/task/${taskId}/edit/`, {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': formData.get('csrfmiddlewaretoken'), // CSRF токен
-                    'X-Requested-With': 'XMLHttpRequest' // Для определения AJAX запроса в Django
-                },
-                body: formData
-            })
-            .then(response => {
+            const data = {
+                name: this.querySelector('input[name="title"]').value,
+                description: this.querySelector('textarea[name="description"]').value,
+                status: this.querySelector('select[name="status"]').value,
+               
+            };
+
+            try {
+                const response = await fetch(`/tasks/${taskId}/`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken,
+                        'X-Requested-With': 'XMLHttpRequest'  // Добавьте этот заголовок
+                    },
+                    body: JSON.stringify(data)
+                });
+
                 if (!response.ok) {
-                    throw new Error('Network response was not ok');
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Ошибка сервера');
                 }
-                return response.json();
-                console.log('Success:', data);
-                location.reload();
-            })
-            .then(data => {
-                // Обработка успешного ответа
-                console.log('Success:', data);
-                location.reload();
-            })
-            .catch(error => {
+                
+                // Закрываем модальное окно
+                const modal = bootstrap.Modal.getInstance(this.closest('.modal'));
+                if (modal) {
+                    modal.hide();
+                }
+                
+                // Обновляем страницу
+                window.location.reload();
+                
+            } catch (error) {
                 console.error('Error:', error);
-            
-                alert('Произошла ошибка при сохранении задачи');
-            });
+                alert('Ошибка при сохранении: ' + error.message);
+            }
         });
     });
+}
+
+// Вызываем функцию после загрузки DOM
+document.addEventListener('DOMContentLoaded', function() {
+    setupEditHandlers();
+    
+    // Ваш существующий код для удаления задач...
 });
 document.getElementById('inviteForm').addEventListener('click', function(e) {
     e.preventDefault(); // не отправлять форму
@@ -391,8 +401,9 @@ document.getElementById('inviteForm').addEventListener('click', function(e) {
                         <div class="modal fade" id="editTaskModal{{ task.id }}" tabindex="-1">
                             <div class="modal-dialog">
                             <div class="modal-content">
-                                <form id="EditForm" method="POST">
+                                <form id="EditForm{{ task.id }}" class="edit-task-form">
                                     {% csrf_token %}
+                                    <input type="hidden" name="task_id" value="{{ task.id }}">678
                                     <div class="modal-header">
                                         <h5 class="modal-title">Редактировать задачу</h5>
                                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -417,7 +428,7 @@ document.getElementById('inviteForm').addEventListener('click', function(e) {
                                         </div>
                                     </div>
                                     <div class="modal-footer">
-                                        <button type="submit" class="btn btn-primary">Сохранить</button>
+                                        <button type="submit" class="btn btn-primary" >Сохранить</button>
                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
                                     </div>
                                 </form>
