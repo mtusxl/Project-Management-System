@@ -35,7 +35,7 @@ INSTALLED_APPS = [
     'Tasks',
     'Dashbords',
     'Index', 
-    "widget_tweaks"
+    "rest_framework",
 ]
 
 MIDDLEWARE = [
@@ -112,7 +112,7 @@ AUTH_USER_MODEL = 'Users.User'
 
 LANGUAGE_CODE = 'ru'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Moscow'
 
 USE_I18N = True
 
