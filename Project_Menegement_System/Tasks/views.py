@@ -16,17 +16,7 @@ from Projects.models import Project
 
 
 class TaskAPI(APIView):
-    
-    def get_task(self, id):
-        return get_object_or_404(Task, id=id)
 
-   
-    def get(self, request):
-        print(request)
-        all_tasks = Task.objects.all()
-        serializer = TaskSerializers(all_tasks, many=True)
-        return Response(serializer.data)
-    
 
     def post(self, request):
         data = request.data.copy()
@@ -34,6 +24,11 @@ class TaskAPI(APIView):
         
         if serializer.is_valid():
             serializer.save()
+            print("Задача создана")
+            project = get_object_or_404(Project, id=data["project"])
+            print(project)
+            tasks_project = project.tasks.all()
+            print(tasks_project)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         
         print("Ошибки валидации:", serializer.errors)
@@ -47,6 +42,13 @@ class TaskDetailAPI(APIView):
 
     def get_task(self, id):
         return get_object_or_404(Task, id=id)
+    
+    def get(self, request, id):
+       
+        task = self.get_task(id)
+        print(task.id)
+        serializer = TaskSerializers(task)
+        return Response(serializer.data)
 
     def patch(self, request, id):  
         task = self.get_task(id)
