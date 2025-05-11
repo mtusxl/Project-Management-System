@@ -4,154 +4,331 @@
 
 {% block content %}
 <script>
-    
-    async function createTask(event) {
-    event.preventDefault();
-    
-    const form = document.getElementById('taskForm');
-    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-    
-    const data = {
-        name: document.getElementById('taskName').value,
-        description: document.getElementById('taskDescription').value,
-        assigned_to: document.getElementById('taskAssignee').value || null,
-        due_date: document.getElementById('taskDueDate').value || null,
-        status: "to_do",
-        project: "{{ project.id }}"  
-    };
-
-    try {
-        const response = await fetch("/tasks/", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRFToken": csrfToken,
-                "X-Requested-With": "XMLHttpRequest"  // Помечаем как AJAX-запрос
-            },
-            body: JSON.stringify(data),
-        });
-
-        // Проверяем Content-Type ответа
-        const contentType = response.headers.get("content-type");
-        if (!contentType || !contentType.includes("application/json")) {
-            const text = await response.text();
-            throw new Error(`Ожидался JSON, но получен: ${text.slice(0, 100)}...`);
+    // Функция для загрузки данных проекта
+    async function loadProjectData() {
+        try {
+            const response = await fetch(`/api/projects/{{ project.slug }}/`, {
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+            
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.detail || 'Ошибка загрузки данных');
+            }
+            return await response.json();
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Не удалось загрузить данные проекта: ' + error.message);
+            return null;
         }
-
-        const newTask = await response.json();
-        
-        // Обновляем страницу после успешного создания
-        window.location.reload();
-        
-    } catch (error) {
-        console.error("Error:", error);
-        alert(`Ошибка: ${error.message}`);
     }
-}
 
+    // Функция для обновления интерфейса
+    async function updateUI() {
+        const data = await loadProjectData();
+        if (!data) return;
+        console.log("Page update");
+
+        // Обновляем заголовок и описание проекта
+        document.querySelector('h1').textContent = data.project.name;
+        document.getElementById('projectDescription').value = data.project.description || '';
+        
+        // Обновляем дату создания
+        document.getElementById('projectCreatedAt').textContent = data.project.created_at;
+        
+        // Обновляем автора
+        document.getElementById('projectAuthor').textContent = data.project.author.username;
+
+        // Обновляем список участников
+        const membersList = document.querySelector('.members-list');
+        membersList.innerHTML = data.project.members.map(member => `
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                ${member.username}
+                ${member.id === data.project.author.id ? '<span class="badge bg-primary">Автор</span>' : ''}
+            </li>
+        `).join('') || '<li class="list-group-item">Нет участников</li>';
+
+        // Обновляем задачи
+        updateTaskColumns(data);
+    }
+
+    // Функция для обновления колонок задач
+    function updateTaskColumns(data) {
+        const columns = {
+            'to_do': data.tasks_todo,
+            'in_progress': data.tasks_in_progress,
+            'done': data.tasks_done
+        };
+
+        for (const [status, tasks] of Object.entries(columns)) {
+            const column = document.querySelector(`.kanban-column[data-status="${status}"]`);
+            if (!column) continue;
+
+            column.innerHTML = tasks.length ? tasks.map(task => `
+                <div class="card mb-3 task-card" data-task-id="${task.id}">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <h6 class="card-title">${task.name}</h6>
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fa-solid fa-list"></i>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item edit-task-btn" data-task-id="${task.id}">Редактировать</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item text-danger delete-task-btn" data-task-id="${task.id}">Удалить</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="task-meta">
+                            ${task.assigned_to ? `
+                                <span class="badge bg-info text-dark">
+                                    <i class="bi bi-person-fill"></i> ${task.assigned_to.username}
+                                </span>
+                            ` : ''}
+                            ${status === 'done' ? `
+                                <span class="badge bg-success">
+                                    <i class="bi bi-check-circle"></i> Завершено
+                                </span>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            `).join('') : `
+                <div class="text-center text-muted py-3">
+                    <p>Нет задач</p>
+                </div>
+            `;
+        }
+    }
+
+    // Функция для открытия модального окна редактирования
+    async function openEditTaskModal(taskId) {
+        try {
+            // Загружаем данные задачи
+            const response = await fetch(`/api/tasks/${taskId}/`);
+            if (!response.ok) throw new Error('Ошибка загрузки задачи');
+            const task = await response.json();
+            console.log(task);
+            // Заполняем форму
+            document.getElementById('editTaskId').value = task.id;
+            document.getElementById('editTaskTitle').value = task.name;
+            document.getElementById('editTaskDescription').value = task.description || '';
+            document.getElementById('editTaskStatus').value = task.status;
+            
+            // Показываем модальное окно
+            const modal = new bootstrap.Modal(document.getElementById('editTaskModal'));
+            modal.show();
+            
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Не удалось загрузить данные задачи');
+        }
+    }
+
+    // Создание новой задачи
+    async function createTask(event) {
+        event.preventDefault();
+        
+        const form = document.getElementById('taskForm');
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        
+        
+        const data = {
+            name: document.getElementById('taskName').value,
+            description: document.getElementById('taskDescription').value,
+            assigned_to: document.getElementById('taskAssignee').value || null,
+            due_date: document.getElementById('taskDueDate').value || null,
+            status: "to_do",
+            project: "{{ project.id }}"  
+        };
+
+        try {
+            const response = await fetch("/api/tasks/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": csrfToken
+                },
+                body: JSON.stringify(data),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || JSON.stringify(errorData));
+            }
+
+            // Очищаем форму
+            form.reset();
+            toggleTaskForm();
+            await updateUI();
+            console.log("Task create");
+            
+        } catch (error) {
+            console.error("Error:", error);
+            alert(`Ошибка: ${error.message}`);
+        }
+    }
+
+    // Удаление задачи
+    async function deleteTask(taskId) {
+        if (!confirm("Удалить задачу?")) return;
+
+        try {
+            const response = await fetch(`/api/tasks/${taskId}/`, {
+                method: "DELETE",
+                headers: { 
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Ошибка удаления задачи');
+            }
+
+            await updateUI();
+            
+        } catch (error) {
+            console.error("Error:", error);
+            alert(`Ошибка: ${error.message}`);
+        }
+    }
+
+    // Обновление задачи
+    async function updateTask(taskId, data) {
+        try {
+            const response = await fetch(`/api/tasks/${taskId}/`, {
+                method: "PATCH",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Ошибка обновления задачи');
+            }
+
+            return await response.json();
+            
+        } catch (error) {
+            console.error('Error:', error);
+            throw error;
+        }
+    }
+
+    // Обновление описания проекта
+    async function updateProjectDescription() {
+        const description = document.getElementById('projectDescription').value;
+        
+        try {
+            const response = await fetch(`/api/projects/{{ project.slug }}/`, {
+                method: "PATCH",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({ description })
+            });
+
+            if (!response.ok) {
+                throw new Error('Ошибка обновления описания проекта');
+            }
+
+            alert('Описание успешно обновлено');
+            
+        } catch (error) {
+            console.error('Error:', error);
+            alert(`Ошибка: ${error.message}`);
+        }
+    }
+
+    // Удаление проекта
+    async function deleteProject() {
+        if (!confirm('Вы уверены, что хотите удалить проект?')) return;
+
+        try {
+            const response = await fetch(`/api/projects/{{ project.slug }}/`, {
+                method: "DELETE",
+                headers: { 
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                window.location.href = "{% url 'home' %}";
+            } else {
+                throw new Error('Ошибка удаления проекта');
+            }
+            
+        } catch (error) {
+            console.error("Error:", error);
+            alert(`Ошибка: ${error.message}`);
+        }
+    }
+
+    // Вспомогательные функции
     function toggleTaskForm() {
         const form = document.getElementById('taskFormContainer');
         form.style.display = form.style.display === 'none' ? 'block' : 'none';
     }
-    
-    function showSaveButton() {
-        document.getElementById('saveDescriptionBtn').style.display = 'block';
-    }
-    
-    function hideSaveButtonIfEmpty() {
-        const textarea = document.getElementById('projectDescription');
-        const saveBtn = document.getElementById('saveDescriptionBtn');
-        saveBtn.style.display = 'none';
-    }
 
-    document.addEventListener("DOMContentLoaded", function () {
-        document.querySelectorAll(".delete-task").forEach(button => {
-            button.addEventListener("click", function () {
-                const taskId = this.getAttribute("data-task-id");
-                if (confirm("Удалить задачу?")) {
-                    fetch(`/tasks/${taskId}/`, {
-                        method: "DELETE",
-                        headers: { 'X-CSRFToken': '{{ csrf_token }}' }
-                    }).then(response => {
-                        if (response.ok) {
-                            this.closest(".task-item").remove();
-                            window.location.reload();
-                        }
-                    });
-                }
-            });
+    // Инициализация при загрузке страницы
+    document.addEventListener("DOMContentLoaded", function() {
+        // Загружаем данные при открытии страницы
+        updateUI();
+
+        // Обработчики для кнопок задач
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('delete-task-btn')) {
+                e.preventDefault();
+                deleteTask(e.target.dataset.taskId);
+            }
+            
+            if (e.target.classList.contains('edit-task-btn')) {
+                e.preventDefault();
+                const taskId = e.target.dataset.taskId;
+                openEditTaskModal(taskId);
+            }
         });
-    });
 
-    function setupEditHandlers() {
-    document.querySelectorAll('.edit-task-form').forEach(form => {
-        form.addEventListener('submit', async function(e) {
+        // Обработчик для формы обновления описания проекта
+        document.querySelector('.update-description-form').addEventListener('submit', function(e) {
             e.preventDefault();
-            
-            const taskId = this.querySelector('input[name="task_id"]').value;
-            const csrfToken = this.querySelector('[name=csrfmiddlewaretoken]').value;
-            
+            updateProjectDescription();
+        });
+
+        // Обработчик для кнопки удаления проекта
+        document.querySelector('.delete-project-btn').addEventListener('click', deleteProject);
+        
+        // Обработчик формы редактирования задачи
+        document.getElementById('editTaskForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const taskId = document.getElementById('editTaskId').value;
             const data = {
-                name: this.querySelector('input[name="title"]').value,
-                description: this.querySelector('textarea[name="description"]').value,
-                status: this.querySelector('select[name="status"]').value,
-               
+                name: document.getElementById('editTaskTitle').value,
+                description: document.getElementById('editTaskDescription').value,
+                status: document.getElementById('editTaskStatus').value
             };
-
+            
             try {
-                const response = await fetch(`/tasks/${taskId}/`, {
-                    method: 'PATCH',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': csrfToken,
-                        'X-Requested-With': 'XMLHttpRequest'  // Добавьте этот заголовок
-                    },
-                    body: JSON.stringify(data)
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.message || 'Ошибка сервера');
-                }
-                
-                // Закрываем модальное окно
-                const modal = bootstrap.Modal.getInstance(this.closest('.modal'));
-                if (modal) {
-                    modal.hide();
-                }
-                
-                // Обновляем страницу
-                window.location.reload();
-                
+                await updateTask(taskId, data);
+                const modal = bootstrap.Modal.getInstance(document.getElementById('editTaskModal'));
+                modal.hide();
+                await updateUI();
             } catch (error) {
                 console.error('Error:', error);
-                alert('Ошибка при сохранении: ' + error.message);
+                alert('Ошибка при обновлении задачи: ' + error.message);
             }
         });
     });
-}
-
-// Вызываем функцию после загрузки DOM
-document.addEventListener('DOMContentLoaded', function() {
-    setupEditHandlers();
-    
-    // Ваш существующий код для удаления задач...
-});
-document.getElementById('inviteForm').addEventListener('click', function(e) {
-    e.preventDefault(); // не отправлять форму
-    const emailInput = document.getElementById('inviteEmail');
-    const successAlert = document.getElementById('inviteSuccess');
-
-    if (emailInput.value !== "") {
-      // Тут будет отправка данных на бэкенд, пока просто эффект
-      emailInput.value = "";
-    }
-  });
-
-
-
-
-
 </script>
 
 <div class="container mt-4">
@@ -170,23 +347,23 @@ document.getElementById('inviteForm').addEventListener('click', function(e) {
         <div class="tab-pane fade show active" id="review" role="tabpanel" aria-labelledby="review-tab">
             <div class="mt-4">
                 <h4>Описание проекта</h4>
-                <form method="post" action="{% url 'update_project' project.slug %}" class="mb-4">
+                <form class="update-description-form mb-4">
                     {% csrf_token %}
                     <div class="mb-3">
                         <label for="projectDescription" class="form-label">Описание проекта</label>
-                        <textarea id="projectDescription" name="description" class="form-control" rows="4">{{ project.description }}</textarea>
+                        <textarea id="projectDescription" class="form-control" rows="4"></textarea>
                     </div>
                     <button type="submit" class="btn btn-primary">Сохранить описание</button>
                 </form>
                 
                 <div class="row mt-4">
                     <div class="col-md-6">
-                        <h5>Создан: {{ project.created_at|date:"d.m.Y" }}</h5>
-                        <h5>Автор: {{ project.author.username }}</h5>
+                        <h5>Создан: <span id="projectCreatedAt">{{ project.created_at|date:"d.m.Y" }}</span></h5>
+                        <h5>Автор: <span id="projectAuthor">{{ project.author.username }}</span></h5>
                     </div>
                     <div class="col-md-6">
                         <h5>Члены проекта</h5>
-                        <ul class="list-group">
+                        <ul class="list-group members-list">
                             {% for member in project.members.all %}
                                 <li class="list-group-item d-flex justify-content-between align-items-center">
                                     {{ member.username }}
@@ -198,19 +375,15 @@ document.getElementById('inviteForm').addEventListener('click', function(e) {
                                 <li class="list-group-item">Нет участников</li>
                             {% endfor %}
                         </ul>
-                        <!-- Кнопка для открытия модального окна -->
                         <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#inviteModal">
                             Пригласить участника
                         </button>
-
-                       
                     </div>
                 </div>
             </div>
-            <form method="post" action="{% url 'delete_project' project.slug %}"  onsubmit="return confirm('Вы уверены, что хотите удалить проект?');">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-outline-danger">Удалить проект</button>
-            </form>
+            <button type="button" class="btn btn-outline-danger delete-project-btn">
+                Удалить проект
+            </button>
         </div>
         
         <div class="tab-pane fade" id="tasks" role="tabpanel" aria-labelledby="tasks-tab">
@@ -225,20 +398,20 @@ document.getElementById('inviteForm').addEventListener('click', function(e) {
                 <!-- Форма добавления новой задачи -->
                 <div id="taskFormContainer" class="card mb-4" style="display: none;">
                     <div class="card-body">
-                        <form method="post" onsubmit="createTask(event)">
+                        <form id="taskForm" onsubmit="createTask(event)">
                             {% csrf_token %}
                             <div class="mb-3">
                                 <label for="taskName" class="form-label">Название задачи*</label>
-                                <input type="text" class="form-control" id="taskName" name="newTaskName" required>
+                                <input type="text" class="form-control" id="taskName" required>
                             </div>
                             <div class="mb-3">
                                 <label for="taskDescription" class="form-label">Описание</label>
-                                <textarea class="form-control" id="taskDescription" name="newTaskDescription" rows="3"></textarea>
+                                <textarea class="form-control" id="taskDescription" rows="3"></textarea>
                             </div>
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label for="taskAssignee" class="form-label">Исполнитель</label>
-                                    <select class="form-select" id="taskAssignee" name="newTaskassigned_to">
+                                    <select class="form-select" id="taskAssignee">
                                         <option value="">Не назначен</option>
                                         {% for member in project.members.all %}
                                             <option value="{{ member.id }}">{{ member.username }}</option>
@@ -247,62 +420,27 @@ document.getElementById('inviteForm').addEventListener('click', function(e) {
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label for="taskDueDate" class="form-label">Срок выполнения</label>
-                                    <input type="date" class="form-control" id="taskDueDate" name="due_date">
+                                    <input type="date" class="form-control" id="taskDueDate">
                                 </div>
                             </div>
                             <button type="submit" class="btn btn-primary">Создать задачу</button>
                             <button type="button" class="btn btn-outline-secondary ms-2" onclick="toggleTaskForm()">Отмена</button>
                         </form>
                     </div>
-                    
                 </div>
 
-                
-                
                 <!-- Канбан-доска -->
                 <div class="kanban-board">
                     <div class="row">
                         <!-- Колонка "Нужно сделать" -->
-                        <div  class="col-md-4 mb-3">
+                        <div class="col-md-4 mb-3">
                             <div class="card h-100">
                                 <div class="card-header bg-primary text-white d-flex justify-content-between">
                                     <h5 class="card-title mb-0">Нужно сделать</h5>
-                                    <span class="badge bg-light text-dark">{{ tasks_todo.count }}</span>
+                                    <span class="badge bg-light text-dark" id="todo-count">0</span>
                                 </div>
-                                <div class="card-body kanban-column">
-                                    {% for task in tasks_todo %}
-                                        <div class="card mb-3 task-card">
-                                            <div class="card-body">
-                                                <div class="d-flex justify-content-between">
-                                                    <h6 class="card-title">{{ task.name }}</h6>
-                                                    <div class="dropdown">
-                                                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                            <i class="fa-solid fa-list"></i>
-                                                        </button>
-                                                        <ul class="dropdown-menu">
-                                                            <li><a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#editTaskModal{{ task.id }}">Редактировать</a></li>
-                                                            <li><hr class="dropdown-divider"></li>
-                                                            <li><a class="dropdown-item text-danger delete-task" data-task-id="{{ task.id }}">Удалить</a></li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                                <div class="task-meta">
-                                                    {% if task.assigned_to %}
-                                                        <span class="badge bg-info text-dark">
-                                                            <i class="bi bi-person-fill"></i> {{ task.assigned_to.username }}
-                                                        </span>
-                                                    {% endif %}
-                                                </div>
-                                                
-        
-                                            </div>
-                                            
-                                        </div>
-                                    {% empty %}
-                                        <div class="text-center text-muted py-3">
-                                            <p>Нет задач</p>
-                                        </div>
-                                    {% endfor %}
+                                <div class="card-body kanban-column" data-status="to_do">
+                                    <!-- Задачи будут загружаться через JavaScript -->
                                 </div>
                             </div>
                         </div>
@@ -312,40 +450,10 @@ document.getElementById('inviteForm').addEventListener('click', function(e) {
                             <div class="card h-100">
                                 <div class="card-header bg-warning text-dark d-flex justify-content-between">
                                     <h5 class="card-title mb-0">В процессе</h5>
-                                    <span class="badge bg-light text-dark">{{ tasks_in_progress.count }}</span>
+                                    <span class="badge bg-light text-dark" id="in-progress-count">0</span>
                                 </div>
-                                <div class="card-body kanban-column">
-                                    {% for task in tasks_in_progress %}
-                                        <div class="card mb-3 task-card">
-                                            <div class="card-body">
-                                                <div class="d-flex justify-content-between">
-                                                    <h6 class="card-title">{{ task.name }}</h6>
-                                                    <div class="dropdown">
-                                                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                            <i class="fa-solid fa-list"></i>
-                                                        </button>
-                                                        <ul class="dropdown-menu">
-                                                            <li><a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#editTaskModal{{ task.id }}">Редактировать</a></li>
-                                                            <li><hr class="dropdown-divider"></li>
-                                                            <li><a class="dropdown-item text-danger delete-task" data-task-id="{{ task.id }}">Удалить</a></li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                            
-                                                <div class="task-meta">
-                                                    {% if task.assigned_to %}
-                                                        <span class="badge bg-info text-dark">
-                                                            <i class="bi bi-person-fill"></i> {{ task.assigned_to.username }}
-                                                        </span>
-                                                    {% endif %}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    {% empty %}
-                                        <div class="text-center text-muted py-3">
-                                            <p>Нет задач</p>
-                                        </div>
-                                    {% endfor %}
+                                <div class="card-body kanban-column" data-status="in_progress">
+                                    <!-- Задачи будут загружаться через JavaScript -->
                                 </div>
                             </div>
                         </div>
@@ -355,115 +463,76 @@ document.getElementById('inviteForm').addEventListener('click', function(e) {
                             <div class="card h-100">
                                 <div class="card-header bg-success text-white d-flex justify-content-between">
                                     <h5 class="card-title mb-0">Выполнено</h5>
-                                    <span class="badge bg-light text-dark">{{ tasks_done.count }}</span>
+                                    <span class="badge bg-light text-dark" id="done-count">0</span>
                                 </div>
-                                <div class="card-body kanban-column">
-                                    {% for task in tasks_done %}
-                                        <div class="card mb-3 task-card">
-                                            <div class="card-body">
-                                                <div class="d-flex justify-content-between">
-                                                    <h6 class="card-title">{{ task.name }}</h6>
-                                                    <div class="dropdown">
-                                                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                            <i class="fa-solid fa-list"></i>
-                                                        </button>
-                                                        <ul class="dropdown-menu">
-                                                            <li><a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#editTaskModal{{ task.id }}">Редактировать</a></li>
-                                                            <li><hr class="dropdown-divider"></li>
-                                                            <li><a class="dropdown-item text-danger delete-task" data-task-id="{{ task.id }}">Удалить</a></li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                                
-                                                <div class="task-meta">
-                                                    {% if task.assigned_to %}
-                                                        <span class="badge bg-info text-dark">
-                                                            <i class="bi bi-person-fill"></i> {{ task.assigned_to.username }}
-                                                        </span>
-                                                    {% endif %}
-                                                    <span class="badge bg-success">
-                                                        <i class="bi bi-check-circle"></i> Завершено
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    {% empty %}
-                                        <div class="text-center text-muted py-3">
-                                            <p>Нет задач</p>
-                                        </div>
-                                    {% endfor %}
+                                <div class="card-body kanban-column" data-status="done">
+                                    <!-- Задачи будут загружаться через JavaScript -->
                                 </div>
                             </div>
                         </div>
                     </div>
-                    {% for task in tasks %}
-                        <!-- Модальное окно -->
-                        <div class="modal fade" id="editTaskModal{{ task.id }}" tabindex="-1">
-                            <div class="modal-dialog">
-                            <div class="modal-content">
-                                <form id="EditForm{{ task.id }}" class="edit-task-form">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="task_id" value="{{ task.id }}">678
-                                    <div class="modal-header">
-                                        <h5 class="modal-title">Редактировать задачу</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <div class="mb-3">
-                                            <label for="title{{ task.id }}" class="form-label">Название</label>
-                                            <input type="text" name="title" id="title{{ task.id }}" class="form-control" value="{{ task.name }}" required>
-                                            <input type="hidden" name="task_id" value="{{ task.id }}">
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="description{{ task.id }}" class="form-label">Описание</label>
-                                            <textarea name="description" id="description{{ task.id }}" class="form-control">{{ task.description }}</textarea>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="status{{ task.id }}" class="form-label">Статус</label>
-                                            <select name="status" id="status{{ task.id }}" class="form-select">
-                                                <option value="to_do" {% if task.status == 'to_do' %}selected{% endif %}>В планах</option>
-                                                <option value="in_progress" {% if task.status == 'in_progress' %}selected{% endif %}>В работе</option>
-                                                <option value="done" {% if task.status == 'done' %}selected{% endif %}>Готово</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="submit" class="btn btn-primary" >Сохранить</button>
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-                                    </div>
-                                </form>
-                            </div>
-                            </div>
-                        </div>
-  
-                    {% endfor %}
-  
                 </div>
             </div>
         </div>
     </div>
 </div>
- <!-- Модальное окно -->
- <div class="modal fade" id="inviteModal" tabindex="-1" aria-labelledby="inviteModalLabel" aria-hidden="true">
+
+<!-- Модальное окно для приглашения участника -->
+<div class="modal fade" id="inviteModal" tabindex="-1" aria-labelledby="inviteModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content rounded-3 shadow">
-        <div class="modal-header">
-            <h5 class="modal-title" id="inviteModalLabel">Пригласить участника в проект</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
-        </div>
-        <div class="modal-body">
-            <form id="inviteForm">
-            <div class="mb-3">
-                <label for="inviteEmail" class="form-label">Email участника</label>
-                <input type="email" class="form-control" id="inviteEmail" placeholder="example@example.com" required>
+            <div class="modal-header">
+                <h5 class="modal-title" id="inviteModalLabel">Пригласить участника в проект</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
             </div>
-            <button  class="btn btn-primary">Пригласить</button>
+            <div class="modal-body">
+                <form id="inviteForm">
+                    <div class="mb-3">
+                        <label for="inviteEmail" class="form-label">Email участника</label>
+                        <input type="email" class="form-control" id="inviteEmail" placeholder="example@example.com" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Пригласить</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно для редактирования задачи -->
+<div class="modal fade" id="editTaskModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="editTaskForm" class="edit-task-form">
+                {% csrf_token %}
+                <input type="hidden" name="task_id" id="editTaskId">
+                <div class="modal-header">
+                    <h5 class="modal-title">Редактировать задачу</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="editTaskTitle" class="form-label">Название</label>
+                        <input type="text" name="title" id="editTaskTitle" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editTaskDescription" class="form-label">Описание</label>
+                        <textarea name="description" id="editTaskDescription" class="form-control"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editTaskStatus" class="form-label">Статус</label>
+                        <select name="status" id="editTaskStatus" class="form-select">
+                            <option value="to_do">В планах</option>
+                            <option value="in_progress">В работе</option>
+                            <option value="done">Готово</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Сохранить</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                </div>
             </form>
         </div>
-        </div>
     </div>
-    </div>
-
-
-
+</div>
 {% endblock %}

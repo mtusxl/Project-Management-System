@@ -5,7 +5,7 @@
 {% block content %}
     <div class="container mt-5">
         <h2 class="mb-4">Создать проект</h2>
-        <form action="{% url 'create_project' %}" method="post">
+        <form id="projectForm">
             {% csrf_token %}
             <!-- Название проекта -->
             <div class="mb-3">
@@ -19,8 +19,6 @@
                 <textarea class="form-control" id="project_description" name="project_description" rows="4" placeholder="Введите описание проекта" required></textarea>
             </div>
             
-
-            
             <!-- Члены проекта -->
             <div class="mb-3">
                 <label class="form-label">Члены проекта</label>
@@ -28,17 +26,21 @@
                     <!-- Выбранные члены будут отображаться здесь -->
                 </div>
                 <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#addMemberModal">Добавить члена</button>
+                <input type="hidden" id="members_data" name="members_data">
             </div>
+            
+            <!-- Задачи проекта -->
             <div class="mb-3">
                 <label class="form-label">Задачи проекта</label>
                 <div id="tasks-section">
                     <!-- Задачи будут добавляться сюда динамически -->
                 </div>
                 <button type="button" class="btn btn-secondary" id="add-task">Добавить задачу</button>
+                <input type="hidden" name="task_count" id="task_count" value="0">
             </div>
             
             <!-- Кнопка создания проекта -->
-            <button type="submit" class="btn btn-primary">Создать проект</button>
+            <button type="button" class="btn btn-primary" onclick="createProject()">Создать проект</button>
         </form>
     </div>
 
@@ -68,70 +70,145 @@
                             <label for="member_email" class="form-label">Почта</label>
                             <input type="email" class="form-control" id="member_email" placeholder="Введите почту" required>
                         </div>
-
                         
-                        
-                        <button type="button" class="btn btn-primary" id="addMemberBtn" onclick=Add_member()>Добавить</button>
+                        <button type="button" class="btn btn-primary" id="addMemberBtn" onclick="Add_member()">Добавить</button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
+    
     <script>
+        // Глобальные переменные для хранения данных
+        let members = [];
+        let taskCount = 0;
 
-        //Add new task
-       let taskCount = 0;
+        // Добавление новой задачи
+        document.getElementById('add-task').addEventListener('click', function() {
+            taskCount++;
+            document.getElementById('task_count').value = taskCount;
+            
+            const taskForm = `
+                <div class="task-form mb-3" data-task-id="${taskCount}">
+                    <h5>Задача ${taskCount}</h5>
+                    <div class="mb-3">
+                        <label for="task_title_${taskCount}" class="form-label">Название задачи</label>
+                        <input type="text" class="form-control" id="task_title_${taskCount}" name="task_title_${taskCount}" placeholder="Введите название задачи" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="task_description_${taskCount}" class="form-label">Описание задачи</label>
+                        <textarea class="form-control" id="task_description_${taskCount}" name="task_description_${taskCount}" rows="2" placeholder="Введите описание задачи"></textarea>
+                    </div>
+                </div>
+            `;
+            document.getElementById('tasks-section').insertAdjacentHTML('beforeend', taskForm);
+        });
 
-       document.getElementById('add-task').addEventListener('click', function() {
-           taskCount++;
-           const taskForm = `
-               <div class="task-form mb-3">
-                   <h5>Задача ${taskCount}</h5>
-                   <div class="mb-3">
-                       <label for="task_title_${taskCount}" class="form-label">Название задачи</label>
-                       <input type="text" class="form-control" id="task_title_${taskCount}" name="task_title_${taskCount}" placeholder="Введите название задачи" required>
-                   </div>
-                   <div class="mb-3">
-                       <label for="task_description_${taskCount}" class="form-label">Описание задачи</label>
-                       <textarea class="form-control" id="task_description_${taskCount}" name="task_description_${taskCount}" rows="2" placeholder="Введите описание задачи"></textarea>
-                   </div>
-               </div>
-               <input type="hidden" name="task_count" value="${taskCount}">
-           `;
-           document.getElementById('tasks-section').insertAdjacentHTML('beforeend', taskForm);
-       });
-       function Add_member() {
+        // Добавление члена проекта
+        function Add_member() {
+            const firstName = document.getElementById('member_first_name').value;
+            const lastName = document.getElementById('member_last_name').value;
+            const middleName = document.getElementById('member_middle_name').value;
+            const email = document.getElementById('member_email').value;
 
-           const firstName = document.getElementById('member_first_name').value;
-           const lastName = document.getElementById('member_last_name').value;
-           const middleName = document.getElementById('member_middle_name').value;
-           const email = document.getElementById('member_email').value;
+            if (firstName && lastName && email) {
+                const memberData = {
+                    firstName: firstName,
+                    lastName: lastName,
+                    middleName: middleName,
+                    email: email
+                };
+                
+                members.push(memberData);
+                updateMembersList();
+                
+                // Очистка формы и закрытие модального окна
+                document.getElementById('addMemberForm').reset();
+                const modal = bootstrap.Modal.getInstance(document.getElementById('addMemberModal'));
+                modal.hide();
+            } else {
+                alert('Пожалуйста, заполните все обязательные поля!');
+            }
+        }
 
-           if (firstName && lastName && email) {
-               const fullName = `${lastName} ${firstName} ${middleName}`;
-               const membersList = document.getElementById('members-list');
+        // Обновление списка членов проекта
+        function updateMembersList() {
+            const membersList = document.getElementById('members-list');
+            membersList.innerHTML = '';
+            
+            members.forEach((member, index) => {
+                const fullName = `${member.lastName} ${member.firstName} ${member.middleName}`;
+                const memberItem = document.createElement('div');
+                memberItem.classList.add('mb-2');
+                memberItem.innerHTML = `
+                    <span>${fullName} (${member.email})</span>
+                    <button type="button" class="btn btn-sm btn-danger ms-2" onclick="removeMember(${index})">×</button>
+                    <input type="hidden" name="members[]" value="${JSON.stringify(member)}">
+                `;
+                membersList.appendChild(memberItem);
+            });
+            
+            // Сохраняем данные в hidden input
+            document.getElementById('members_data').value = JSON.stringify(members);
+        }
 
-               const memberItem = document.createElement('div');
-               memberItem.classList.add('mb-2');
-               memberItem.innerHTML = `
-                   <span>${fullName} (${email})</span>
-                   <input type="hidden" name="members[]" value="${fullName}|${email}">
-               `;
+        // Удаление члена проекта
+        function removeMember(index) {
+            members.splice(index, 1);
+            updateMembersList();
+        }
 
-               membersList.appendChild(memberItem);
+        // Создание проекта
+        async function createProject() {
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            const projectName = document.getElementById('project_name').value;
+            const projectDescription = document.getElementById('project_description').value;
+            
+            // Собираем данные задач
+            const tasks = [];
+            for (let i = 1; i <= taskCount; i++) {
+                const title = document.getElementById(`task_title_${i}`)?.value;
+                const description = document.getElementById(`task_description_${i}`)?.value;
+                
+                if (title) {
+                    tasks.push({
+                        name: title,
+                        description: description || '',
+                        status: 'to_do'
+                    });
+                }
+            }
+            
+            // Подготавливаем данные для отправки
+            const projectData = {
+                name: projectName,
+                description: projectDescription,
+                members: members,
+                tasks: tasks
+            };
 
-               // Очистка формы и закрытие модального окна
-               document.getElementById('addMemberForm').reset();
-               const modal = bootstrap.Modal.getInstance(document.getElementById('addMemberModal'));
-               modal.hide();
-           } else {
-               alert('Пожалуйста, заполните все обязательные поля!');
-           }
-       }
+            try {
+                const response = await fetch("/api/create_project/", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": csrfToken
+                    },
+                    body: JSON.stringify(projectData)
+                });
 
-      
-   </script>
-    {% endblock %}
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Ошибка при создании проекта');
+                }
 
-
-
+                const result = await response.json();
+                window.location.href = `/project/${result.slug}/`;
+                
+            } catch (error) {
+                console.error("Error:", error);
+                alert(`Ошибка: ${error.message}`);
+            }
+        }
+    </script>
+{% endblock %}
