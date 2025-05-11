@@ -22,11 +22,12 @@
 - Python 3.12
 - Django 5.x
 - Django ORM
+- DRF
 - MySQL
 
 ### Frontend:
 - HTML, CSS (Bootstrap 5)
-- JavaScript (с Fetch API)
+- JavaScript
 - Именованные шаблоны Django
 
 ### Дополнительно:
