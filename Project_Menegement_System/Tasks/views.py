@@ -9,6 +9,7 @@ from rest_framework.response import Response
 from django.http import JsonResponse
 
 
+from Tasks.permission import TasksPermission
 from Tasks.serializers import TaskSerializers
 from .models import Task
 from Projects.models import Project
@@ -16,6 +17,7 @@ from Projects.models import Project
 
 
 class TaskAPI(APIView):
+    permission_classes=[TasksPermission]
 
 
     def post(self, request):
@@ -39,6 +41,7 @@ class TaskAPI(APIView):
     
 
 class TaskDetailAPI(APIView):
+    permission_classes = [TasksPermission]
 
     def get_task(self, id):
         return get_object_or_404(Task, id=id)
