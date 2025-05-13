@@ -5,6 +5,7 @@ from django.views.decorators.http import require_POST
 from django.http import JsonResponse
 from django.db.models import Q
 
+from Projects.permission import ProjectPermission
 from Projects.seriallizer import ProjectSerializer
 from .models import Project
 from Tasks.models import Task
@@ -18,6 +19,7 @@ from rest_framework.renderers import TemplateHTMLRenderer, JSONRenderer
 
 class project_detailAPI(APIView):
     renderer_classes = [TemplateHTMLRenderer, JSONRenderer]
+    permission_classes = [ProjectPermission]
     template_name = 'project.html'
 
 
