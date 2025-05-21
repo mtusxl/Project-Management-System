@@ -36,6 +36,9 @@
         document.querySelector('h1').textContent = data.project.name;
         document.getElementById('projectDescription').value = data.project.description || '';
         
+        
+
+        
         // Обновляем дату создания
         document.getElementById('projectCreatedAt').textContent = data.project.created_at;
         
@@ -60,9 +63,12 @@
         const columns = {
             'to_do': data.tasks_todo,
             'in_progress': data.tasks_in_progress,
-            'done': data.tasks_done
+            'done': data.tasks_done,
         };
-
+        document.getElementById("todo-count").textContent = data.count_todo;
+        document.getElementById("in-progress-count").textContent = data.count_in_progress;
+        document.getElementById("done-count").textContent = data.count_done;
+        
         for (const [status, tasks] of Object.entries(columns)) {
             const column = document.querySelector(`.kanban-column[data-status="${status}"]`);
             if (!column) continue;
@@ -103,6 +109,8 @@
                 </div>
             `;
         }
+        
+
     }
 
     // Функция для открытия модального окна редактирования
